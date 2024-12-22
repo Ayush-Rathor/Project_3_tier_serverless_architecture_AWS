@@ -116,7 +116,7 @@
         const resultDiv = document.getElementById('result');
 
         // Replace with your API Gateway endpoint
-        const apiEndpoint = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev/POST';
+        const apiEndpoint = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev';
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -137,7 +137,7 @@
                 }
 
                 const data = await response.json();
-                resultDiv.textContent = `Palindrome: ${data.result}`;
+                resultDiv.textContent = `Is Palindrome: ${data.is_palindrome}`;
             } catch (error) {
                 resultDiv.textContent = `Error: ${error.message}`;
             }
