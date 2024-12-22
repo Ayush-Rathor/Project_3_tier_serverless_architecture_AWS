@@ -87,6 +87,7 @@ form.addEventListener("submit", async (event) => {
 
     const inputString = inputField.value.trim(); // Get value and remove leading/trailing spaces
 
+    // Check if the input string is empty
     if (!inputString) {
         resultDiv.textContent = "Please enter a non-empty string.";
         return;
@@ -99,7 +100,7 @@ form.addEventListener("submit", async (event) => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ input: inputString }),
+            body: JSON.stringify({ input: inputString }), // Send the input string
         });
 
         // Check if the response is not OK (statusCode != 200)
