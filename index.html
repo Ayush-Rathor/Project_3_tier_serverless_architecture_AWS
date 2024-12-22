@@ -75,17 +75,18 @@
     <div id="result"></div>
 
     <script>
-        const form = document.getElementById("palindromeForm");
+    const form = document.getElementById("palindromeForm");
 const resultDiv = document.getElementById("result");
-const inputField = document.getElementById("inputString"); // Ensure you get the input element
+const inputField = document.getElementById("inputString");
 
-// Replace with your API Gateway endpoint
 const apiEndpoint = "https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev";
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault(); // Prevent default form submission
 
     const inputString = inputField.value.trim(); // Get value and remove leading/trailing spaces
+
+    console.log("Input string before sending:", inputString); // Log the input string
 
     // Check if the input string is empty
     if (!inputString) {
@@ -94,7 +95,6 @@ form.addEventListener("submit", async (event) => {
     }
 
     try {
-        // Make the API request
         const response = await fetch(apiEndpoint, {
             method: "POST",
             headers: {
@@ -103,18 +103,13 @@ form.addEventListener("submit", async (event) => {
             body: JSON.stringify({ input: inputString }), // Send the input string
         });
 
-        // Check if the response is not OK (statusCode != 200)
         if (!response.ok) {
             throw new Error("Error: " + response.statusText);
         }
 
-        // Parse the JSON response
         const data = await response.json();
-
-        // Log the response for debugging purposes
         console.log("API Response:", data);
 
-        // Check if the 'is_palindrome' key exists in the response body
         if (data && data.is_palindrome !== undefined) {
             resultDiv.textContent = `Is Palindrome: ${data.is_palindrome ? "Yes" : "No"}`;
         } else {
@@ -122,12 +117,11 @@ form.addEventListener("submit", async (event) => {
         }
 
     } catch (error) {
-        // Log the error and show it in the UI
-        console.log("Request failed", error); // Debugging
+        console.log("Request failed", error);
         resultDiv.textContent = `Error: ${error.message}`;
     }
 });
-
+    
     </script>
 </body>
 </html>
