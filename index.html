@@ -34,12 +34,44 @@
             transform: scale(1.05); /* Hover effect on the container */
         }
 
+        /* Animated Heading */
         h1 {
             font-family: 'Roboto', sans-serif;
-            font-size: 2rem;
+            font-size: 3rem;
             margin-bottom: 1rem;
-            color: #fff;
+            color: transparent;
+            background-image: linear-gradient(to left, #ff7e5f, #feb47b);
+            background-clip: text;
+            text-transform: uppercase;
+            font-weight: 700;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            animation: gradientAnimation 3s ease infinite, bounceAnimation 1s ease-in-out infinite;
+        }
+
+        /* Text Gradient Animation */
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Bouncing Text Animation */
+        @keyframes bounceAnimation {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
         }
 
         /* Input Field */
