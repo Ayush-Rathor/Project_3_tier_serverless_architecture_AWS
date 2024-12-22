@@ -1,0 +1,85 @@
+import json
+import boto3
+from datetime import datetime
+
+# Initialize the DynamoDB client
+dynamodb = boto3.resource('dynamodb')
+table_name = 'PalindromeCheckerTable'  # Replace with your table name
+table = dynamodb.Table(table_name)
+
+def lambda_handler(event, context):
+
+    print(f"Received event body: {event.get('body')}")
+    # Handle preflight (OPTIONS) request for CORS
+    if event.get('httpMethod') == 'OPTIONS':  # Changed to .get() to avoid KeyError
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            },
+            "body": ""
+        }
+
+    try:
+        # Log the incoming event for debugging
+        print(f"Received event: {json.dumps(event)}")
+
+        # Parse the input from the event (request body)
+        body = json.loads(event.get("body", "{}"))
+        print(f"Parsed body: {json.dumps(body)}")  # Log the parsed body
+
+        input_string = body.get("input", "")
+        
+        # Check if the input is valid
+        if not isinstance(input_string, str) or not input_string.strip():
+            return {
+                "statusCode": 400,
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type"
+                },
+                "body": json.dumps({"error": "Invalid input. Please provide a non-empty string."})
+            }
+        
+        # Clean and process the input
+        clean_string = "".join(c.lower() for c in input_string if c.isalnum())
+        print(f"Cleaned string: {clean_string}")  # Log the cleaned string
+        
+        # Check if the input is a palindrome
+        is_palindrome = clean_string == clean_string[::-1]
+        print(f"Is palindrome: {is_palindrome}")  # Log the palindrome result
+
+        # Save only the boolean result into DynamoDB
+        table.put_item(
+            Item={
+                "id": str(datetime.utcnow().isoformat()),  # Use ISO timestamp as unique ID
+                "input_string": input_string,
+                "is_palindrome": is_palindrome,
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        )
+        
+        # Return the result with CORS headers
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            },
+            "body": json.dumps({"is_palindrome": is_palindrome})  # Ensure it's a valid JSON string
+        }
+    
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            },
+            "body": json.dumps({"error": str(e)})
+        }
