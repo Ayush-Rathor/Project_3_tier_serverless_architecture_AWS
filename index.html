@@ -136,10 +136,11 @@
                 throw new Error('Failed to fetch response from API');
             }
 
-            const data = await response.json(); // Parse the JSON response
+            // Parse the response body (it's a stringified JSON object)
+            const data = await response.json();
 
-            // Check if the response contains the 'is_palindrome' field
-            if (data && data.is_palindrome !== undefined) {
+            // Check if 'is_palindrome' exists in the response
+            if (data && data.hasOwnProperty('is_palindrome')) {
                 resultDiv.textContent = `Is Palindrome: ${data.is_palindrome ? 'Yes' : 'No'}`;
             } else {
                 resultDiv.textContent = 'Error: Invalid response from the server.';
@@ -148,7 +149,16 @@
             resultDiv.textContent = `Error: ${error.message}`;
         }
     });
+        const data = await response.json();
+console.log("Response from API:", data); // Log the data to inspect it
+if (data && data.hasOwnProperty('is_palindrome')) {
+    resultDiv.textContent = `Is Palindrome: ${data.is_palindrome ? 'Yes' : 'No'}`;
+} else {
+    resultDiv.textContent = 'Error: Invalid response from the server.';
+}
+
 </script>
+
 
 </body>
 </html>
