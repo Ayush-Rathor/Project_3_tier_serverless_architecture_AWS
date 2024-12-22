@@ -4,77 +4,199 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palindrome Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            border: 2px solid #ddd;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:active {
+            background-color: #003f7f;
+        }
+
+        .result {
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            padding: 10px;
+            border-radius: 6px;
+            color: white;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .success {
+            background-color: #28a745;
+        }
+
+        .error {
+            background-color: #dc3545;
+        }
+
+        .loading {
+            font-size: 1.2rem;
+            color: #007bff;
+            margin-top: 1.5rem;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+    </style>
 </head>
 <body>
-    <h1>Palindrome Checker</h1>
-    <label for="inputString">Enter text:</label>
-    <input type="text" id="inputString" />
-    <button onclick="checkPalindrome()">Check Palindrome</button>
-    <p id="result"></p>
+
+    <div class="container">
+        <h1>Palindrome Checker</h1>
+        <input type="text" id="inputString" placeholder="Enter a string to check">
+        <button onclick="checkPalindrome()">Check</button>
+        <div id="loading" class="loading" style="display:none;">Checking...</div>
+        <div id="result" class="result"></div>
+    </div>
 
     <script>
-       const apiUrl = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev';
+        const apiUrl = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev';
 
-function checkPalindrome() {
-    const input = document.getElementById('inputString').value.trim(); // Trim any extra spaces
-    if (!input) {
-        document.getElementById('result').textContent = 'Please enter a valid non-empty string.';
-        return; // If input is empty, do not proceed
-    }
+        function checkPalindrome() {
+            const input = document.getElementById('inputString').value.trim(); // Trim any extra spaces
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
 
-    // Prepare the request body in the required format
-    const requestBody = {
-        body: JSON.stringify({ input: input }) // Wrap the actual input inside a "body" key
-    };
-
-    // Clear previous result
-    document.getElementById('result').textContent = "Checking...";
-
-    // Make the API call to Lambda through API Gateway
-    fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody) // Send the formatted request body
-    })
-    .then(response => {
-        console.log('Raw API Response:', response);  // Debug: Log the raw API response
-        return response.json();  // Parse the response as JSON
-    })
-    .then(data => {
-        console.log('Parsed API Response:', data);  // Debug: Log the parsed response data
-
-        if (data && data.body) {
-            try {
-                const body = JSON.parse(data.body);  // Parse the body of the response
-                console.log('Parsed Body:', body);  // Debug: Log the parsed body
-
-                if (body.is_palindrome !== undefined) {
-                    // Check the palindrome result and display the appropriate message
-                    const resultMessage = body.is_palindrome 
-                        ? 'The input is a palindrome.' 
-                        : 'The input is not a palindrome.';
-                    document.getElementById('result').textContent = resultMessage;
-                } else {
-                    // If the response does not have the expected structure
-                    document.getElementById('result').textContent = 'Something went wrong. Please try again.';
-                }
-            } catch (error) {
-                console.error('Error parsing response body:', error);  // Log any parsing errors
-                document.getElementById('result').textContent = 'Something went wrong. Please try again.';
+            if (!input) {
+                resultDiv.textContent = 'Please enter a valid non-empty string.';
+                resultDiv.classList.remove('success', 'error');
+                return; // If input is empty, do not proceed
             }
-        } else {
-            // If the response does not have a body or expected data
-            document.getElementById('result').textContent = 'Something went wrong. Please try again.';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);  // Log any errors for debugging
-        document.getElementById('result').textContent = 'Something went wrong. Please try again.';
-    });
-}
 
+            // Prepare the request body in the required format
+            const requestBody = {
+                body: JSON.stringify({ input: input }) // Wrap the actual input inside a "body" key
+            };
+
+            // Clear previous result and show loading spinner
+            resultDiv.textContent = "";
+            resultDiv.classList.remove('success', 'error');
+            resultDiv.style.opacity = 0;
+            loadingDiv.style.display = 'block';
+
+            // Make the API call to Lambda through API Gateway
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody) // Send the formatted request body
+            })
+            .then(response => response.json())  // Parse the response as JSON
+            .then(data => {
+                loadingDiv.style.display = 'none';  // Hide loading spinner
+
+                if (data && data.body) {
+                    try {
+                        const body = JSON.parse(data.body);  // Parse the body of the response
+
+                        if (body.is_palindrome !== undefined) {
+                            // Show the result with an animation
+                            const resultMessage = body.is_palindrome 
+                                ? 'The input is a palindrome.' 
+                                : 'The input is not a palindrome.';
+
+                            resultDiv.textContent = resultMessage;
+                            resultDiv.classList.add(body.is_palindrome ? 'success' : 'error');
+                            resultDiv.style.opacity = 1;
+                        } else {
+                            resultDiv.textContent = 'Something went wrong. Please try again.';
+                            resultDiv.classList.add('error');
+                            resultDiv.style.opacity = 1;
+                        }
+                    } catch (error) {
+                        console.error('Error parsing response body:', error);
+                        resultDiv.textContent = 'Something went wrong. Please try again.';
+                        resultDiv.classList.add('error');
+                        resultDiv.style.opacity = 1;
+                    }
+                } else {
+                    resultDiv.textContent = 'Something went wrong. Please try again.';
+                    resultDiv.classList.add('error');
+                    resultDiv.style.opacity = 1;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Log any errors for debugging
+                loadingDiv.style.display = 'none';
+                resultDiv.textContent = 'Something went wrong. Please try again.';
+                resultDiv.classList.add('error');
+                resultDiv.style.opacity = 1;
+            });
+        }
     </script>
+
 </body>
 </html>
