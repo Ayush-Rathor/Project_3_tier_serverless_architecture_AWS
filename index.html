@@ -13,7 +13,7 @@
     <p id="result"></p>
 
     <script>
-        const apiUrl = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev';
+       const apiUrl = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev';
 
 function checkPalindrome() {
     const input = document.getElementById('inputString').value.trim(); // Trim any extra spaces
@@ -45,14 +45,27 @@ function checkPalindrome() {
     .then(data => {
         console.log('Parsed API Response:', data);  // Debug: Log the parsed response data
 
-        if (data && data.is_palindrome !== undefined) {
-            // Check the palindrome result and display the appropriate message
-            const resultMessage = data.is_palindrome 
-                ? 'The input is a palindrome.' 
-                : 'The input is not a palindrome.';
-            document.getElementById('result').textContent = resultMessage;
+        if (data && data.body) {
+            try {
+                const body = JSON.parse(data.body);  // Parse the body of the response
+                console.log('Parsed Body:', body);  // Debug: Log the parsed body
+
+                if (body.is_palindrome !== undefined) {
+                    // Check the palindrome result and display the appropriate message
+                    const resultMessage = body.is_palindrome 
+                        ? 'The input is a palindrome.' 
+                        : 'The input is not a palindrome.';
+                    document.getElementById('result').textContent = resultMessage;
+                } else {
+                    // If the response does not have the expected structure
+                    document.getElementById('result').textContent = 'Something went wrong. Please try again.';
+                }
+            } catch (error) {
+                console.error('Error parsing response body:', error);  // Log any parsing errors
+                document.getElementById('result').textContent = 'Something went wrong. Please try again.';
+            }
         } else {
-            // If the response does not have the expected structure
+            // If the response does not have a body or expected data
             document.getElementById('result').textContent = 'Something went wrong. Please try again.';
         }
     })
