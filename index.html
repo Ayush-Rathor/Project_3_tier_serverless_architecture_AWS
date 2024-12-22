@@ -112,36 +112,43 @@
     <footer>Powered by AWS Lambda and API Gateway</footer>
 
     <script>
-        const form = document.getElementById('palindromeForm');
-        const resultDiv = document.getElementById('result');
+    const form = document.getElementById('palindromeForm');
+    const resultDiv = document.getElementById('result');
 
-        // Replace with your API Gateway endpoint
-        const apiEndpoint = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev';
+    // Replace with your API Gateway endpoint
+    const apiEndpoint = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev';
 
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-            const inputString = document.getElementById('inputString').value;
+        const inputString = document.getElementById('inputString').value;
 
-            try {
-                const response = await fetch(apiEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ input: inputString })
-                });
+        try {
+            const response = await fetch(apiEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ input: inputString }),
+            });
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch response from API');
-                }
-
-                const data = await response.json();
-                resultDiv.textContent = `Is Palindrome: ${data.is_palindrome}`;
-            } catch (error) {
-                resultDiv.textContent = `Error: ${error.message}`;
+            if (!response.ok) {
+                throw new Error('Failed to fetch response from API');
             }
-        });
-    </script>
+
+            const data = await response.json(); // Parse the JSON response
+
+            // Check if the response contains the 'is_palindrome' field
+            if (data && data.is_palindrome !== undefined) {
+                resultDiv.textContent = `Is Palindrome: ${data.is_palindrome ? 'Yes' : 'No'}`;
+            } else {
+                resultDiv.textContent = 'Error: Invalid response from the server.';
+            }
+        } catch (error) {
+            resultDiv.textContent = `Error: ${error.message}`;
+        }
+    });
+</script>
+
 </body>
 </html>
