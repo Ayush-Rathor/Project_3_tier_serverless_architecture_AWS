@@ -4,124 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palindrome Checker</title>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(to bottom right, #8e44ad, #3498db);
-            color: #fff;
-            text-align: center;
-            padding: 50px;
-        }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-        form {
-            margin-top: 20px;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            display: inline-block;
-        }
-        input {
-            padding: 10px;
-            margin-bottom: 20px;
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        input:focus {
-            border-color: #8e44ad;
-            outline: none;
-            box-shadow: 0 0 8px rgba(142, 68, 173, 0.6);
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 1rem;
-            background-color: #8e44ad;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-        button:hover {
-            background-color: #732d91;
-            transform: translateY(-2px);
-        }
-        button:active {
-            transform: translateY(1px);
-        }
-        #result {
-            margin-top: 20px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #16a085;
-        }
-    </style>
 </head>
 <body>
     <h1>Palindrome Checker</h1>
-    <form id="palindromeForm">
-        <label for="inputString">Enter a string:</label>
-        <input type="text" id="inputString" name="inputString" placeholder="Type something..." required>
-        <button type="submit">Check Palindrome</button>
-    </form>
-    <div id="result"></div>
+    <label for="inputString">Enter text:</label>
+    <input type="text" id="inputString" />
+    <button onclick="checkPalindrome()">Check Palindrome</button>
+    <p id="result"></p>
 
     <script>
-    const form = document.getElementById("palindromeForm");
-const resultDiv = document.getElementById("result");
-const inputField = document.getElementById("inputString");
+        const apiUrl = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev';
 
-const apiEndpoint = "https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev";
+        function checkPalindrome() {
+            const input = document.getElementById('inputString').value;
+            const data = { input: input };
 
-form.addEventListener("submit", async (event) => {
-    event.preventDefault(); // Prevent default form submission
+            // Clear previous result
+            document.getElementById('result').textContent = "Checking...";
 
-    const inputString = inputField.value.trim(); // Get value and remove leading/trailing spaces
+            // Make the API call to Lambda through API Gateway
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                console.log('Raw API Response:', response);  // Debug: Log the raw API response
+                return response.json();  // Parse the response as JSON
+            })
+            .then(data => {
+                console.log('Parsed API Response:', data);  // Debug: Log the parsed response data
 
-    console.log("Input string before sending:", inputString); // Log the input string
-
-    // Check if the input string is empty
-    if (!inputString) {
-        resultDiv.textContent = "Please enter a non-empty string.";
-        return;
-    }
-
-    try {
-        const response = await fetch(apiEndpoint, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ input: inputString }), // Send the input string
-        });
-
-        if (!response.ok) {
-            throw new Error("Error: " + response.statusText);
+                if (data && data.is_palindrome !== undefined) {
+                    // Check the palindrome result and display the appropriate message
+                    const resultMessage = data.is_palindrome 
+                        ? 'The input is a palindrome.' 
+                        : 'The input is not a palindrome.';
+                    document.getElementById('result').textContent = resultMessage;
+                } else {
+                    // If the response does not have the expected structure
+                    document.getElementById('result').textContent = 'Something went wrong. Please try again.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);  // Log any errors for debugging
+                document.getElementById('result').textContent = 'Something went wrong. Please try again.';
+            });
         }
-
-        const data = await response.json();
-        console.log("API Response:", data);
-
-        if (data && data.is_palindrome !== undefined) {
-            resultDiv.textContent = `Is Palindrome: ${data.is_palindrome ? "Yes" : "No"}`;
-        } else {
-            resultDiv.textContent = "Something went wrong. Please try again.";
-        }
-
-    } catch (error) {
-        console.log("Request failed", error);
-        resultDiv.textContent = `Error: ${error.message}`;
-    }
-});
-    
     </script>
 </body>
 </html>
