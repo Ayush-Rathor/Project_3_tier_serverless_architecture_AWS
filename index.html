@@ -149,15 +149,7 @@
             resultDiv.textContent = `Error: ${error.message}`;
         }
     });
-        const data = await response.json();
-console.log("Response from API:", data); // Log the data to inspect it
-if (data && data.hasOwnProperty('is_palindrome')) {
-    resultDiv.textContent = `Is Palindrome: ${data.is_palindrome ? 'Yes' : 'No'}`;
-} else {
-    resultDiv.textContent = 'Error: Invalid response from the server.';
-}
-
-</script>
+    </script>
 
 
 </body>
