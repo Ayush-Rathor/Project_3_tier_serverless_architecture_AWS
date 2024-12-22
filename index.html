@@ -6,10 +6,10 @@
     <title>Palindrome Checker</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Base Styles */
+        /* Body and Background */
         body {
             font-family: 'Open Sans', sans-serif;
-            background-color: #f8f9fa;
+            background: linear-gradient(to right, #ff7e5f, #feb47b); /* Gradient background */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,6 +18,7 @@
             color: #333;
         }
 
+        /* Container */
         .container {
             background-color: #fff;
             padding: 2rem;
@@ -26,14 +27,22 @@
             width: 100%;
             max-width: 400px;
             text-align: center;
+            transition: transform 0.5s ease;
+        }
+
+        .container:hover {
+            transform: scale(1.05); /* Hover effect on the container */
         }
 
         h1 {
             font-family: 'Roboto', sans-serif;
             font-size: 2rem;
             margin-bottom: 1rem;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
         }
 
+        /* Input Field */
         input[type="text"] {
             width: 100%;
             padding: 12px;
@@ -43,32 +52,37 @@
             font-size: 1rem;
             outline: none;
             transition: border-color 0.3s ease;
+            background-color: #f9f9f9;
         }
 
         input[type="text"]:focus {
-            border-color: #007bff;
+            border-color: #ff7e5f;
         }
 
+        /* Button Styling */
         button {
-            background-color: #007bff;
+            background-color: #ff7e5f;
             color: white;
             padding: 12px 24px;
             border: none;
             border-radius: 6px;
             font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
             width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #feb47b;
+            transform: scale(1.05); /* Hover effect */
         }
 
         button:active {
-            background-color: #003f7f;
+            background-color: #ff6f61;
         }
 
+        /* Result Styling */
         .result {
             font-size: 1.2rem;
             margin-top: 1.5rem;
@@ -76,7 +90,7 @@
             border-radius: 6px;
             color: white;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 1s ease-in-out, transform 0.5s ease-in-out;
         }
 
         .success {
@@ -87,13 +101,15 @@
             background-color: #dc3545;
         }
 
+        /* Loading Spinner */
         .loading {
-            font-size: 1.2rem;
-            color: #007bff;
+            font-size: 1.5rem;
+            color: #ff7e5f;
             margin-top: 1.5rem;
             animation: pulse 1.5s infinite ease-in-out;
         }
 
+        /* Pulse Animation */
         @keyframes pulse {
             0% {
                 transform: scale(1);
@@ -109,6 +125,26 @@
             }
         }
 
+        /* Emoji Animation */
+        .emoji {
+            font-size: 2rem;
+            margin: 0 0.2rem;
+            display: inline-block;
+            animation: bounce 1s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -117,7 +153,9 @@
         <h1>Palindrome Checker</h1>
         <input type="text" id="inputString" placeholder="Enter a string to check">
         <button onclick="checkPalindrome()">Check</button>
-        <div id="loading" class="loading" style="display:none;">Checking...</div>
+        <div id="loading" class="loading" style="display:none;">
+            <span class="emoji">🔍</span> Checking...
+        </div>
         <div id="result" class="result"></div>
     </div>
 
@@ -165,27 +203,31 @@
                         if (body.is_palindrome !== undefined) {
                             // Show the result with an animation
                             const resultMessage = body.is_palindrome 
-                                ? 'The input is a palindrome.' 
-                                : 'The input is not a palindrome.';
+                                ? '✅ The input is a palindrome! 🎉' 
+                                : '❌ The input is not a palindrome. 😢';
 
                             resultDiv.textContent = resultMessage;
                             resultDiv.classList.add(body.is_palindrome ? 'success' : 'error');
                             resultDiv.style.opacity = 1;
+                            resultDiv.style.transform = 'scale(1.1)';
                         } else {
                             resultDiv.textContent = 'Something went wrong. Please try again.';
                             resultDiv.classList.add('error');
                             resultDiv.style.opacity = 1;
+                            resultDiv.style.transform = 'scale(1.1)';
                         }
                     } catch (error) {
                         console.error('Error parsing response body:', error);
                         resultDiv.textContent = 'Something went wrong. Please try again.';
                         resultDiv.classList.add('error');
                         resultDiv.style.opacity = 1;
+                        resultDiv.style.transform = 'scale(1.1)';
                     }
                 } else {
                     resultDiv.textContent = 'Something went wrong. Please try again.';
                     resultDiv.classList.add('error');
                     resultDiv.style.opacity = 1;
+                    resultDiv.style.transform = 'scale(1.1)';
                 }
             })
             .catch(error => {
@@ -194,6 +236,7 @@
                 resultDiv.textContent = 'Something went wrong. Please try again.';
                 resultDiv.classList.add('error');
                 resultDiv.style.opacity = 1;
+                resultDiv.style.transform = 'scale(1.1)';
             });
         }
     </script>
