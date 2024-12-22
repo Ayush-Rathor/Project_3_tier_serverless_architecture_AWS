@@ -8,45 +8,21 @@
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(to bottom right, #8e44ad, #3498db);
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            color: #fff;
+            text-align: center;
+            padding: 50px;
         }
         h1 {
             font-size: 3rem;
             margin-bottom: 20px;
-            color: #ffffff;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1.5s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         form {
-            background: #ffffff;
+            margin-top: 20px;
+            background-color: #fff;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            animation: slideIn 1s ease;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        label {
-            font-size: 1.1rem;
-            color: #2c3e50;
-            display: block;
-            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: inline-block;
         }
         input {
             padding: 10px;
@@ -86,20 +62,8 @@
             font-size: 1.3rem;
             font-weight: bold;
             color: #16a085;
-            animation: popIn 0.5s ease;
-        }
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        footer {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #ecf0f1;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <h1>Palindrome Checker</h1>
@@ -109,48 +73,54 @@
         <button type="submit">Check Palindrome</button>
     </form>
     <div id="result"></div>
-    <footer>Powered by AWS Lambda and API Gateway</footer>
 
     <script>
-    const form = document.getElementById('palindromeForm');
-    const resultDiv = document.getElementById('result');
+        // API Gateway URL
+        const apiEndpoint = "https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev";
 
-    // Replace with your API Gateway endpoint
-    const apiEndpoint = 'https://m7ucobz39b.execute-api.ap-south-1.amazonaws.com/Dev';
+        // Get references to HTML elements
+        const form = document.getElementById("palindromeForm");
+        const inputField = document.getElementById("inputString");
+        const resultDiv = document.getElementById("result");
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
+        // Form submit event
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevent default form submission
 
-        const inputString = document.getElementById('inputString').value;
+            const inputString = inputField.value.trim();
 
-        try {
-            const response = await fetch(apiEndpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ input: inputString }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch response from API');
+            if (!inputString) {
+                resultDiv.textContent = "Please enter a non-empty string.";
+                return;
             }
 
-            // Parse the response body (it's a stringified JSON object)
-            const data = await response.json();
+            try {
+                // API request
+                const response = await fetch(apiEndpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ input: inputString }),
+                });
 
-            // Check if 'is_palindrome' exists in the response
-            if (data && data.hasOwnProperty('is_palindrome')) {
-                resultDiv.textContent = `Is Palindrome: ${data.is_palindrome ? 'Yes' : 'No'}`;
-            } else {
-                resultDiv.textContent = 'Error: Invalid response from the server.';
+                // Check for response errors
+                if (!response.ok) {
+                    throw new Error("Error: " + response.statusText);
+                }
+
+                const data = await response.json();
+
+                // Display result
+                if (data.is_palindrome !== undefined) {
+                    resultDiv.textContent = `Is Palindrome: ${data.is_palindrome ? "Yes" : "No"}`;
+                } else {
+                    resultDiv.textContent = "Something went wrong. Please try again.";
+                }
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
             }
-        } catch (error) {
-            resultDiv.textContent = `Error: ${error.message}`;
-        }
-    });
+        });
     </script>
-
-
 </body>
 </html>
